@@ -8,6 +8,7 @@ using System.Data.SQLite;
 using System.IO;
 using System.Reflection;
 using System.Globalization;
+using Autodesk.Revit.UI;
 
 namespace Metamorphosis
 {
@@ -50,7 +51,8 @@ namespace Metamorphosis
             // populate
             exportParameterData();
 
-            _doc.Application.WriteJournalComment("Export Completed. Releasing hold on database file.", false);
+            //_doc.Application.WriteJournalComment("Export Completed. Releasing hold on database file.", false);
+
             // release the hold on the database 
             //https://stackoverflow.com/questions/8511901/system-data-sqlite-close-not-releasing-database-file
             GC.Collect();
@@ -95,11 +97,15 @@ namespace Metamorphosis
             DateTime start = DateTime.Now;
             
             // retrieve all of the instance elements, and process them.
-            FilteredElementCollector coll = new FilteredElementCollector(_doc);
-            coll.WhereElementIsNotElementType();
 
+            FilteredElementCollector coll = new FilteredElementCollector(_doc, _doc.ActiveView.Id);  //get only the object visible in the active view
+            coll.WhereElementIsNotElementType();
+            
             Dictionary<ElementId, Element> typeElementsUsed = new Dictionary<ElementId, Element>();
+            
             IList<Element> instances = coll.ToElements().Where(e => e.Category != null).ToList();
+
+
             foreach ( var elem in instances)
             {
                 if (elem.Category == null) continue; // don't do it!
@@ -120,7 +126,7 @@ namespace Metamorphosis
             }
 
             string msg = (DateTime.Now - start) + ": " + instances.Count + " instances and " + typeElementsUsed.Count + " types.";
-            _doc.Application.WriteJournalComment(msg, false);
+            //_doc.Application.WriteJournalComment(msg, false);
             System.Diagnostics.Debug.WriteLine(msg);
 
             // go through all of the type elements and instances and capture the parameter ids
@@ -143,17 +149,18 @@ namespace Metamorphosis
             log((DateTime.Now - start) + ": Id Table Updated for Types");
             updateIdTable(instances, false);
             log((DateTime.Now - start) + ": Id Table Updated for Instances");
-            updateAttributeTable();
-            log((DateTime.Now - start) + ": Attribute Table Updated for All");
+
+            //updateAttributeTable();
+            //log((DateTime.Now - start) + ": Attribute Table Updated for All");
 
 
-            updateEntityAttributeValues(typeElementsUsed.Values.ToList());
-            log((DateTime.Now - start) + ": Att/Values Table Updated for Types");
+            //updateEntityAttributeValues(typeElementsUsed.Values.ToList());
+            //log((DateTime.Now - start) + ": Att/Values Table Updated for Types");
 
-            updateEntityAttributeValues(instances);
-            log((DateTime.Now - start) + ": Att/Values Table Updated for Instances");
-            updateValueTable();
-            log((DateTime.Now - start) + ": Value Table Updated for All");
+            //updateEntityAttributeValues(instances);
+            //log((DateTime.Now - start) + ": Att/Values Table Updated for Instances");
+            //updateValueTable();
+            //log((DateTime.Now - start) + ": Value Table Updated for All");
 
             updateGeometryTable(instances);
             log((DateTime.Now - start) + ": Geometry Table Updated for Types");
@@ -163,34 +170,105 @@ namespace Metamorphosis
 
         private void log(string msg)
         {
-            _doc.Application.WriteJournalComment(msg, false);
+            //_doc.Application.WriteJournalComment(msg, false);
             System.Diagnostics.Debug.WriteLine(msg);
         }
+
+        private string GetElementTypeFamilyAndName(Document doc, Element typeEle)
+        {
+            string result = "";
+
+            try
+            {
+
+                ElementType eleType = typeEle as ElementType;
+
+                result += $"{eleType.FamilyName} : {typeEle.Name}";
+                }
+                catch
+                {
+
+                    ElementType et = doc.GetElement(typeEle.GetTypeId()) as ElementType;
+
+                    result += $"{typeEle.Name} : {et.Name}";
+                }
+            return result;
+        }
+
+        private string GetInstaceFamilyAndName(Document doc, Element typeEle)
+        {
+            string result = "";
+
+            try
+            {
+                ElementType et = doc.GetElement(typeEle.GetTypeId()) as ElementType;
+
+                result += $"{et.FamilyName} : {typeEle.Name}";
+                }
+                catch
+                {
+                }
+            return result;
+        }
+
+
 
         private void updateIdTable(IList<Element> elements, bool isTypes)
         {
             using (SQLiteConnection conn = new SQLiteConnection("Data Source=" + _dbFilename + ";Version=3;"))
             {
+                string errorElements = "";
+
                 conn.Open();
                 using (var transaction = conn.BeginTransaction())
                 {
                     foreach (Element e in elements)
                     {
                         Category c = e.Category;
+
+                        string familyAndName = ""; //get element Name
+
+                        if (isTypes == true)
+                        {
+                            familyAndName = GetElementTypeFamilyAndName(_doc, e);
+                        }
+                        else
+                        {
+                            familyAndName = GetInstaceFamilyAndName(_doc, e);
+                        }
+
                         if (c == null)
                         {
                             FamilySymbol fs = e as FamilySymbol;
-                            if (fs != null) c = fs.Family.FamilyCategory;
+                            if (fs != null)
+                            {
+                                c = fs.Family.FamilyCategory;
+                                
+                            }
+                                
                         }
+
                         string catName = (c != null) ? c.Name : "(none)";
                         if (catName.Contains("'")) catName = catName.Replace("'", "''");
                         var cmd = conn.CreateCommand();
-                        cmd.CommandText = String.Format("INSERT INTO _objects_id (id,external_id,category,isType) VALUES({0},'{1}','{2}',{3})", e.Id.IntegerValue, e.UniqueId,catName, (isTypes) ? 1:0);
 
-                        cmd.ExecuteNonQuery();
+                        
+                        try
+                        {
+                            cmd.CommandText = String.Format("INSERT INTO _objects_id (id,external_id,category,family_name,isType) VALUES({0},'{1}','{2}','{3}',{4})", e.Id.IntegerValue, e.UniqueId, catName, familyAndName, (isTypes) ? 1 : 0);
+
+                            cmd.ExecuteNonQuery();
+
+                        }
+                        catch
+                        {
+                            errorElements += $"{e.Name} : {e.Id} \n";
+                        }
                     }
 
                     transaction.Commit();
+
+                    TaskDialog.Show("Error", errorElements);
                 }
             }
         }

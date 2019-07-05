@@ -21,7 +21,7 @@ namespace Metamorphosis
            try
             {
 
-                ExternalApp.FirstTimeRun(); // analytics
+                //ExternalApp.FirstTimeRun(); // analytics
                 Document doc = commandData.Application.ActiveUIDocument.Document;
 
                 IList<Document> inMemory = Utilities.RevitUtils.GetProjectsInMemory(commandData.Application.Application);
@@ -32,8 +32,8 @@ namespace Metamorphosis
                 string filename = form.Filename;
 
                 //store for the future? seems like there are suddenly problems with reading this info back...
-                commandData.JournalData.Add("DocumentName", form.SelectedDocument.Title);
-                commandData.JournalData.Add("Filename", form.Filename);
+                //commandData.JournalData.Add("DocumentName", form.SelectedDocument.Title);
+                //commandData.JournalData.Add("Filename", form.Filename);
 
                 SnapshotMaker maker = new SnapshotMaker(form.SelectedDocument, form.Filename);
                 maker.Export();
@@ -70,16 +70,19 @@ namespace Metamorphosis
         /// <param name="filename"></param>
         public static void Export(Document doc, string filename)
         {
-            doc.Application.WriteJournalComment("Launching Batch Metamorphosis Snapshot...", false);
-            doc.Application.WriteJournalComment("  Filename: " + filename, false);
+            //doc.Application.WriteJournalComment("Launching Batch Metamorphosis Snapshot...", false);
+            //doc.Application.WriteJournalComment("  Filename: " + filename, false);
+
             SnapshotMaker maker = new SnapshotMaker(doc, filename);
             maker.Export();
 
-            doc.Application.WriteJournalComment("Snapshot completed. Duration:  " + maker.Duration, false);
-            doc.Application.WriteJournalComment("Garbage Collection to release db...", false);
+            //doc.Application.WriteJournalComment("Snapshot completed. Duration:  " + maker.Duration, false);
+            //doc.Application.WriteJournalComment("Garbage Collection to release db...", false);
+
             GC.Collect();
             GC.WaitForPendingFinalizers();
-            doc.Application.WriteJournalComment("Garbage is collected.", false);
+            
+            //doc.Application.WriteJournalComment("Garbage is collected.", false);
 
         }
     }
