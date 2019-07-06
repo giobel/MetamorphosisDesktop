@@ -89,6 +89,28 @@ namespace MetamorphosisDeskApp.Model
             return CountCategory;
         }
 
+        public List<RevitElement> GetCategoryCount(string dbFilePath, string dbFileName)
+        {
+            List<RevitElement> CountCategory = new List<RevitElement>();
 
+            using (SQLiteConnection conn = createConnection(dbFilePath))
+            {
+                conn.Open();
+
+                var cmd = LaunchCommand(conn, "select category, count(category) from _objects_id group by category");
+
+                using (SQLiteDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string category = reader.GetString(0);
+                        int count = reader.GetInt32(1);
+                        RevitElement element = new RevitElement() { Category = category, DBFileName = dbFileName, ElementId=count};
+                        CountCategory.Add(element);
+                    }
+                }
+            }
+            return CountCategory;
+        }
     }
 }

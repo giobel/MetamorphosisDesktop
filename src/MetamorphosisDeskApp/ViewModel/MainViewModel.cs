@@ -15,11 +15,13 @@ namespace MetamorphosisDeskApp.ViewModel
         public RelayCommand LoadDatabaseCommand { get; }
         public RelayCommand SummaryCommand { get; }
 
+        public FileInfo SelectedDatabase { get; set; }
+
         Model.SQLDBUtilities SQLDB { get; set; }
 
         public string FilePath { get; set; }
 
-        public Dictionary<string, int> CategoriesAndCount { get; set; }
+        public ObservableCollection<Model.RevitElement> CategoriesAndCount { get; set; }
 
         public string ViewTitle { get; internal set; }
 
@@ -35,11 +37,13 @@ namespace MetamorphosisDeskApp.ViewModel
             else
             {
                 ViewTitle = "Metamorphosis Desktop App";
-                FilePath = @"C:\Users\giovanni.brogiolo\Documents\190614_Arch.sdb";
+                FilePath = @"C:\Users\giovanni.brogiolo\Documents";
 
                 DatabaseList = new ObservableCollection<FileInfo>();
 
                 SQLDB = new Model.SQLDBUtilities();
+
+                CategoriesAndCount = new ObservableCollection<Model.RevitElement>();
 
                 revitElements = new ObservableCollection<Model.RevitElement>();
 
@@ -52,7 +56,19 @@ namespace MetamorphosisDeskApp.ViewModel
 
         private void GroupByCategory()
         {
-            CategoriesAndCount = SQLDB.GetCategoryCount(FilePath);
+            try
+            {
+                    List<Model.RevitElement> revitElements = SQLDB.GetCategoryCount(SelectedDatabase.FullName, SelectedDatabase.Name);
+                foreach (var item in revitElements)
+                {
+                    CategoriesAndCount.Add(item);
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
         }
 
         private void LoadRevitElements()

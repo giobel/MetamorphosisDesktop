@@ -28,29 +28,19 @@
                   Grid.Column="0"
                   ItemsSource="{Binding DatabaseList}" 
                   CanUserAddRows="False" 
-                  SelectionMode="Single" 
-                  SelectedItem="{Binding SelectedPDF}" 
-                  SelectionUnit="FullRow">
-
+                  SelectionMode="Extended" 
+                  SelectedItem="{Binding SelectedDatabase, Mode=TwoWay}" 
+                  SelectionUnit="FullRow"
+            AutoGenerateColumns="False">
             <DataGrid.Resources>
-                <Style TargetType="{x:Type DataGridCell}">
-                    <Setter Property="BorderThickness" Value="0"/>
-                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-                    <Style.Triggers>
-                        <Trigger Property="IsSelected"
-                        Value="True">
-                            <Setter Property="BorderThickness"
-                        Value="0" />
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
+                <!--  the actual converter  -->
+                <local:FileSizeConverter x:Key="FileSizeConverter" />
             </DataGrid.Resources>
-
-            <DataGrid.RowStyle>
-                <Style TargetType="{x:Type DataGridRow}">
-                    <Setter Property="Background" Value="{Binding ColorSet}"/>
-                </Style>
-            </DataGrid.RowStyle>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="File name" Width="*" Binding="{Binding Path=Name}" />
+                <DataGridTextColumn Header="File size" Width="*" Binding="{Binding Path=Length, Converter={StaticResource FileSizeConverter}}" />
+                
+            </DataGrid.Columns>
         </DataGrid>
         
         <StackPanel Grid.Row="2">
@@ -58,7 +48,7 @@
             <Button Content="Compare" Width="110" Margin="0,10,0,10" Command="{Binding SummaryCommand}"/>
             <Button Content="Clear" Width="110" Margin="0,10,0,10" Command="{Binding SummaryCommand}"/>
         </StackPanel>
-        
+
         <DataGrid  Grid.RowSpan="3"
                   Grid.Column="1" 
                   ItemsSource="{Binding CategoriesAndCount}" 
@@ -66,25 +56,6 @@
                   SelectionMode="Single" 
                   SelectedItem="{Binding SelectedPDF}" 
                   SelectionUnit="FullRow">
-
-            <DataGrid.RowStyle>
-                <Style TargetType="DataGridRow">
-                    <Setter Property="Background" Value="{Binding ColorSet}"/>
-                </Style>
-            </DataGrid.RowStyle>
-            <DataGrid.Resources>
-                <Style TargetType="DataGridCell">
-                    <Setter Property="BorderThickness" Value="0"/>
-                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-                    <Style.Triggers>
-                        <Trigger Property="IsSelected"
-                        Value="True">
-                            <Setter Property="BorderThickness"
-                        Value="0" />
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </DataGrid.Resources>
         </DataGrid>
     </Grid>
 </Window>

@@ -79,6 +79,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\FileSizeConverter.cs" />
     <Compile Include="Model\SQLDBUtilities.cs" />
     <Compile Include="Model\RevitElement.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
