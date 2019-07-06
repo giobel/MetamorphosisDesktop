@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 using System.Data.SQLite;
 using System.IO;
-using System.Reflection;
 using System.Globalization;
 using Autodesk.Revit.UI;
 
@@ -228,7 +225,7 @@ namespace Metamorphosis
 
                         string familyAndName = ""; //get element Name
 
-                        if (isTypes == true)
+                        if (isTypes)
                         {
                             familyAndName = GetElementTypeFamilyAndName(_doc, e);
                         }
@@ -250,6 +247,9 @@ namespace Metamorphosis
 
                         string catName = (c != null) ? c.Name : "(none)";
                         if (catName.Contains("'")) catName = catName.Replace("'", "''");
+
+                        if (familyAndName.Contains("'")) familyAndName = familyAndName.Replace("'", "''");
+
                         var cmd = conn.CreateCommand();
 
                         
@@ -268,7 +268,16 @@ namespace Metamorphosis
 
                     transaction.Commit();
 
-                    TaskDialog.Show("Error", errorElements);
+                    if (isTypes)
+                    {
+                        TaskDialog.Show("Type Error", errorElements);
+                    }
+                    else
+                    {
+                        TaskDialog.Show("Instance Error", errorElements);
+                    }
+
+
                 }
             }
         }

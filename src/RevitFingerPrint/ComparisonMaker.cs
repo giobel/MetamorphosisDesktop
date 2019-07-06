@@ -41,6 +41,13 @@ namespace Metamorphosis
         #endregion
 
         #region Constructor
+
+
+        public ComparisonMaker()
+        {
+
+        }
+
         public ComparisonMaker(Document doc, string previousFile)
         {
             MoveTolerance = 0.0006;  // default;
@@ -562,7 +569,7 @@ namespace Metamorphosis
                 
             }
         }
-        private void readPrevious()
+        public void readPrevious()
         {
             readHeader();
             readParameters();
@@ -627,6 +634,10 @@ namespace Metamorphosis
             }
            
         }
+
+
+
+
 
         private void readParameters()
         {

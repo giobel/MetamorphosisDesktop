@@ -88,7 +88,7 @@ namespace Metamorphosis.UI
             return string.Empty;
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void buttonStart_Click(object sender, EventArgs e)
         {
             if (Utilities.Utility.IsValidPath(tbFilename.Text) == false)
             {
