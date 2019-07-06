@@ -58,7 +58,7 @@ namespace MetamorphosisDeskApp.Model
                         int isType = reader.GetInt32(3);
 
                         revitElement.DBFileName = dbFileName;
-
+                        revitElement.CategoryCount = 1;
                         revitElement.CategoryName = cat;
                         revitElement.UniqueId = guid;
                         revitElement.IsType = (isType == 1);

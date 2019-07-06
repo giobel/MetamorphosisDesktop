@@ -106,10 +106,12 @@ namespace MetamorphosisDeskApp.ViewModel
             try
             {
                 List<Model.RevitElement> revitElements = SQLDB.readElementsFromDB(SelectedDatabase.FullName, SelectedDatabase.Name);
+                var random = new Random();
+                var color = String.Format("#{0:X6}", random.Next(0x1000000));
+
                 foreach (var item in revitElements)
                 {
-                    var random = new Random();
-                    var color = String.Format("#{0:X6}", random.Next(0x1000000));
+                    
                     item.ColorSet = color;
                     CategoriesAndCount.Add(item);
                 }
@@ -130,7 +132,7 @@ namespace MetamorphosisDeskApp.ViewModel
         {
             try
             {
-                    List<Model.RevitSummary> revitElements = SQLDB.GetCategoryCount(SelectedDatabase.FullName, SelectedDatabase.Name);
+                List<Model.RevitSummary> revitElements = SQLDB.GetCategoryCount(SelectedDatabase.FullName, SelectedDatabase.Name);
 
                 var random = new Random();
                 var color = String.Format("#{0:X6}", random.Next(0x1000000));

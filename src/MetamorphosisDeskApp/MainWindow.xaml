@@ -24,6 +24,7 @@
             
         </StackPanel>
         <DataGrid
+                  EnableRowVirtualization="True"
                   Grid.Row="1"
                   Grid.Column="0"
                   ItemsSource="{Binding DatabaseList}" 
@@ -39,7 +40,7 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="File name" Width="*" Binding="{Binding Path=Name}" />
                 <DataGridTextColumn Header="File size" Width="*" Binding="{Binding Path=Length, Converter={StaticResource FileSizeConverter}}" />
-                
+
             </DataGrid.Columns>
         </DataGrid>
         
@@ -67,13 +68,24 @@
             </Grid>
         </StackPanel>
 
-        <DataGrid  Grid.RowSpan="3"
+        <DataGrid  
+                  EnableRowVirtualization="True"
+                  Grid.RowSpan="3"
                   Grid.Column="1" 
                   ItemsSource="{Binding CategoriesAndCount}" 
                   CanUserAddRows="False" 
                   SelectionMode="Single" 
                   SelectedItem="{Binding SelectedRevitElement}" 
-                  SelectionUnit="FullRow">
+                  SelectionUnit="FullRow"
+            AutoGenerateColumns="False"
+            >
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding DBFileName }" Header="Filepath" />
+                <DataGridTextColumn Binding="{Binding CategoryName}" Header="CategoryName"/>
+                <DataGridTextColumn Binding="{Binding CategoryCount }" Header="Count" />
+                <DataGridTextColumn Binding="{Binding ElementId }" Header="UniqueId" />
+                <DataGridTextColumn Binding="{Binding Path=IsType}" Header="Element Type"/>
+            </DataGrid.Columns>
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
                     <Setter Property="Background" Value="{Binding ColorSet}"/>
