@@ -6,13 +6,16 @@ using System.Threading.Tasks;
 
 namespace MetamorphosisDeskApp.Model
 {
-    public class RevitElement
+    public class RevitElement : IRevitBase
     {
         public string DBFileName { get; set; }
+        public string CategoryName { get; set; }
+        public string ColorSet { get; set; }
+        public int CategoryCount { get; set; }
+
         public int ElementId { get; set; }
         public String UniqueId { get; set; }      
-        public string Category { get; set; }
-
+        
         public Boolean IsType { get; set; }
 
         public string Level { get; set; }
