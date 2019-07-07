@@ -25,13 +25,11 @@ namespace MetamorphosisDeskApp.ViewModel
 
         public string FilePath { get; set; }
 
-        public ObservableCollection<Model.IRevitBase> CategoriesAndCount { get; set; }
-        public List<Model.IRevitBase> BackupCategoriesAndCount { get; set; }
-        public Model.IRevitBase SelectedRevitElement { get; set; }
-
+        public ObservableCollection<Model.RevitBase> CategoriesAndCount { get; set; }
+        public List<Model.RevitBase> BackupCategoriesAndCount { get; set; }
+        public Model.RevitBase SelectedRevitElement { get; set; }
         public string ViewTitle { get; internal set; }
-
-        public ObservableCollection<Model.IRevitBase> revitElements { get; set; }
+        public ObservableCollection<Model.RevitBase> revitElements { get; set; }
 
         
 
@@ -51,11 +49,9 @@ namespace MetamorphosisDeskApp.ViewModel
 
                 SQLDB = new Model.SQLDBUtilities();
 
-                CategoriesAndCount = new ObservableCollection<Model.IRevitBase>();
+                CategoriesAndCount = new ObservableCollection<Model.RevitBase>();
 
-                
-
-                revitElements = new ObservableCollection<Model.IRevitBase>();
+                revitElements = new ObservableCollection<Model.RevitBase>();
 
                 LoadDatabaseCommand = new RelayCommand(() => LoadRevitElements());
 
@@ -75,18 +71,20 @@ namespace MetamorphosisDeskApp.ViewModel
         private void UndoFilter()
         {
             CategoriesAndCount.Clear();
-            CategoriesAndCount = new ObservableCollection<Model.IRevitBase>(BackupCategoriesAndCount);
+            CategoriesAndCount = new ObservableCollection<Model.RevitBase>(BackupCategoriesAndCount);
 
         }
 
         private void FilterCategory()
         {
-            BackupCategoriesAndCount = new List<Model.IRevitBase>(CategoriesAndCount);
+            BackupCategoriesAndCount = new List<Model.RevitBase>(CategoriesAndCount);
             
             try
             {
                 for (int i = CategoriesAndCount.Count - 1; i >= 0; i--)
                 {
+                    //Model.RevitElement rl = CategoriesAndCount[i] as Model.RevitElement; either do a casting or move the property to the base class
+
                     if (CategoriesAndCount[i].CategoryName != SelectedRevitElement.CategoryName)
                     {
                         CategoriesAndCount.RemoveAt(i);
@@ -109,11 +107,12 @@ namespace MetamorphosisDeskApp.ViewModel
                 var random = new Random();
                 var color = String.Format("#{0:X6}", random.Next(0x1000000));
 
-                foreach (var item in revitElements)
+                foreach (Model.RevitElement item in revitElements)
                 {
                     
                     item.ColorSet = color;
                     CategoriesAndCount.Add(item);
+                    
                 }
                 
             }
@@ -141,6 +140,7 @@ namespace MetamorphosisDeskApp.ViewModel
                 {
                     item.ColorSet = color;
                     CategoriesAndCount.Add(item);
+                    
                 }
             }
             catch(Exception ex)

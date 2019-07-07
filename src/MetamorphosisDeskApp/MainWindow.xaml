@@ -67,12 +67,12 @@
 
             </Grid>
         </StackPanel>
-
+        
         <DataGrid  
                   EnableRowVirtualization="True"
                   Grid.RowSpan="3"
                   Grid.Column="1" 
-                  ItemsSource="{Binding CategoriesAndCount}" 
+                    ItemsSource="{Binding CategoriesAndCount}"
                   CanUserAddRows="False" 
                   SelectionMode="Single" 
                   SelectedItem="{Binding SelectedRevitElement}" 
