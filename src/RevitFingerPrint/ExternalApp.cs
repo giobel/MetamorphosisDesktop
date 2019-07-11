@@ -81,8 +81,15 @@ namespace Metamorphosis
             snapshot.LargeImage = getImage("Metamorphosis.Images.Export-32.png");
             snapshot.Image = getImage("Metamorphosis.Images.Export-16.png");
 
-
             panel.AddItem(snapshot);
+
+            var linkSnapshot = new PushButtonData("LinkSnapshot", "Link Snapshot", System.Reflection.Assembly.GetExecutingAssembly().Location, "Metamorphosis.LinkSnapshot");
+            snapshot.ToolTip = "Take a snapshot of a linked model";
+            snapshot.LongDescription = "Take a snapshot of a linked model.";
+            snapshot.LargeImage = getImage("Metamorphosis.Images.Export-32.png");
+            snapshot.Image = getImage("Metamorphosis.Images.Export-16.png");
+
+            panel.AddItem(linkSnapshot);
 
             var comp = new PushButtonData("Compare", "Compare", System.Reflection.Assembly.GetExecutingAssembly().Location, "Metamorphosis.Compare");
             comp.ToolTip = "Compare a model against a previous model";

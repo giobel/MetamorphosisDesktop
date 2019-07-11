@@ -90,12 +90,13 @@ namespace Metamorphosis
         
         private void exportParameterData()
         {
-            _doc.Application.WriteJournalComment("Retrieving Data...", false);
+            //_doc.Application.WriteJournalComment("Retrieving Data...", false);
             DateTime start = DateTime.Now;
-            
+
             // retrieve all of the instance elements, and process them.
 
-            FilteredElementCollector coll = new FilteredElementCollector(_doc, _doc.ActiveView.Id);  //get only the object visible in the active view
+            //FilteredElementCollector coll = new FilteredElementCollector(_doc, _doc.ActiveView.Id);  //get only the object visible in the active view. Not working with Link Model!
+            FilteredElementCollector coll = new FilteredElementCollector(_doc);
             coll.WhereElementIsNotElementType();
             
             Dictionary<ElementId, Element> typeElementsUsed = new Dictionary<ElementId, Element>();
