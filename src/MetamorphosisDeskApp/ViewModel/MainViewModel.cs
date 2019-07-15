@@ -6,6 +6,8 @@ using System;
 using System.Windows;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Windows.Media;
 
 namespace MetamorphosisDeskApp.ViewModel
 {
@@ -18,6 +20,7 @@ namespace MetamorphosisDeskApp.ViewModel
         public RelayCommand FilterCategoryCommand { get; }
         public RelayCommand UndoFilterCommand { get; }
         public RelayCommand LoadAllCommand { get; }
+        public RelayCommand ChangeColorsCommand { get; }
 
         public FileInfo SelectedDatabase { get; set; }
 
@@ -55,17 +58,50 @@ namespace MetamorphosisDeskApp.ViewModel
 
                 LoadDatabaseCommand = new RelayCommand(() => LoadRevitElements());
 
-                SummaryCommand = new RelayCommand(() => GroupByCategory());
+                SummaryCommand = new RelayCommand(() => Summary());
 
-                LoadAllCommand = new RelayCommand(() => LoadAllRevitElements());
+                LoadAllCommand = new RelayCommand(() => LoadAllRevitElementsCommand());
 
                 ClearCommand = new RelayCommand(() => ClearDBList());
 
                 FilterCategoryCommand = new RelayCommand(() => FilterCategory());
 
                 UndoFilterCommand = new RelayCommand(() => UndoFilter());
+
+                ChangeColorsCommand = new RelayCommand(() => ChangeColors());
             }
 
+        }
+
+        private void ChangeColors()
+        {
+
+            List<Model.RevitBase> currentList = CategoriesAndCount.ToList();
+
+            CategoriesAndCount.Clear();
+
+            //var random = new Random();
+            //var color = String.Format("#{0:X6}", random.Next(0x1000000));
+
+            var groupByColor = currentList.GroupBy(item => item.ColorSet).Select(group => group );
+
+            string[] color = new string[]{ "#4287f5", "#0e9c44", "#adb837", "#b84837" };
+
+            for (int i = 0; i < groupByColor.Count(); i++)
+            {
+                foreach (var per in groupByColor.ElementAt(i))
+                {
+                    per.ColorSet = color[i];
+                    CategoriesAndCount.Add(per);
+                }
+
+            }
+        }
+
+        private void Summary()
+        {
+            GroupByCategory.Execute(SQLDB, SelectedDatabase).ForEach( cat => CategoriesAndCount.Add(cat));
+            
         }
 
         private void UndoFilter()
@@ -99,27 +135,9 @@ namespace MetamorphosisDeskApp.ViewModel
 
         }
 
-        private void LoadAllRevitElements()
+        private void LoadAllRevitElementsCommand()
         {
-            try
-            {
-                List<Model.RevitElement> revitElements = SQLDB.readElementsFromDB(SelectedDatabase.FullName, SelectedDatabase.Name);
-                var random = new Random();
-                var color = String.Format("#{0:X6}", random.Next(0x1000000));
-
-                foreach (Model.RevitElement item in revitElements)
-                {
-                    
-                    item.ColorSet = color;
-                    CategoriesAndCount.Add(item);
-                    
-                }
-                
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            LoadAllRevitElements.Execute(SQLDB, SelectedDatabase).ForEach(cat => CategoriesAndCount.Add(cat));
         }
 
         private void ClearDBList()
@@ -127,28 +145,7 @@ namespace MetamorphosisDeskApp.ViewModel
             CategoriesAndCount.Clear();
         }
 
-        private void GroupByCategory()
-        {
-            try
-            {
-                List<Model.RevitSummary> revitElements = SQLDB.GetCategoryCount(SelectedDatabase.FullName, SelectedDatabase.Name);
-
-                var random = new Random();
-                var color = String.Format("#{0:X6}", random.Next(0x1000000));
-
-                foreach (Model.RevitSummary item in revitElements)
-                {
-                    item.ColorSet = color;
-                    CategoriesAndCount.Add(item);
-                    
-                }
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-
-        }
+       
 
         private void LoadRevitElements()
         {

@@ -91,6 +91,8 @@
     <Compile Include="Model\SQLDBUtilities.cs" />
     <Compile Include="Model\RevitElement.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
+    <Compile Include="ViewModel\RelayCommands\GroupByCategory.cs" />
+    <Compile Include="ViewModel\RelayCommands\LoadAllRevitElements.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

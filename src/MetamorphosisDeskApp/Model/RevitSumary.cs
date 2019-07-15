@@ -10,7 +10,7 @@ namespace MetamorphosisDeskApp.Model
     {
         public string DBFileName { get; set; }
         public int CategoryCount { get; set; }
-        public string ColorSet { get; set; }
+        
         
     }
 }

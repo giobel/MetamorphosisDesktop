@@ -10,5 +10,6 @@ namespace MetamorphosisDeskApp.Model
     public class RevitBase
     {
         public string CategoryName { get; set; }
+        public string ColorSet { get; set; }
     }
 }
