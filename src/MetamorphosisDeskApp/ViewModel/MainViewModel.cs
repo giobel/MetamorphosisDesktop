@@ -13,27 +13,26 @@ namespace MetamorphosisDeskApp.ViewModel
 {
     public class MainViewModel : ViewModelBase
     {
-        public ObservableCollection<FileInfo> DatabaseList {get; set;}
+        public FileInfo SelectedDatabase { get; set; }
+        Model.SQLDBUtilities SQLDB { get; set; }
+        public string FilePath { get; set; }
+        public string ViewTitle { get; internal set; }
+
         public RelayCommand LoadDatabaseCommand { get; }
-        public RelayCommand SummaryCommand { get; }
+        public RelayCommand LoadCategoriesAndCount { get; }
         public RelayCommand ClearCommand { get; }
         public RelayCommand FilterCategoryCommand { get; }
         public RelayCommand UndoFilterCommand { get; }
-        public RelayCommand LoadAllCommand { get; }
+        public RelayCommand LoadAllElements { get; }
         public RelayCommand ChangeColorsCommand { get; }
 
-        public FileInfo SelectedDatabase { get; set; }
-
-        Model.SQLDBUtilities SQLDB { get; set; }
-
-        public string FilePath { get; set; }
-
+        public ObservableCollection<FileInfo> DatabaseList { get; set; }
         public ObservableCollection<Model.RevitBase> CategoriesAndCount { get; set; }
+        public ObservableCollection<Model.RevitBase> revitElements { get; set; }
         public List<Model.RevitBase> BackupCategoriesAndCount { get; set; }
         public Model.RevitBase SelectedRevitElement { get; set; }
-        public string ViewTitle { get; internal set; }
-        public ObservableCollection<Model.RevitBase> revitElements { get; set; }
 
+        private Dictionary<string, int> DictCategoriesAndCount = new Dictionary<string, int>();
         
 
         public MainViewModel()
@@ -56,18 +55,19 @@ namespace MetamorphosisDeskApp.ViewModel
 
                 revitElements = new ObservableCollection<Model.RevitBase>();
 
+                // Display a list of all the databases in the input folder
                 LoadDatabaseCommand = new RelayCommand(() => LoadRevitElements());
-
-                SummaryCommand = new RelayCommand(() => Summary());
-
-                LoadAllCommand = new RelayCommand(() => LoadAllRevitElementsCommand());
-
+                // Display all the categories in the project and their element's count
+                LoadCategoriesAndCount = new RelayCommand(() => LoadCategoriesAndCountCommand());
+                // Display all the elements in the project
+                LoadAllElements = new RelayCommand(() => LoadAllRevitElementsCommand());
+                // Clean the DataGrid
                 ClearCommand = new RelayCommand(() => ClearDBList());
-
+                // Select a row in the datagrid. The command will leave only that category visible
                 FilterCategoryCommand = new RelayCommand(() => FilterCategory());
-
+                // Bring back the Database List
                 UndoFilterCommand = new RelayCommand(() => UndoFilter());
-
+                // Change the row colors based on the the database name
                 ChangeColorsCommand = new RelayCommand(() => ChangeColors());
             }
 
@@ -98,10 +98,40 @@ namespace MetamorphosisDeskApp.ViewModel
             }
         }
 
-        private void Summary()
+        private void LoadCategoriesAndCountCommand()
         {
-            GroupByCategory.Execute(SQLDB, SelectedDatabase).ForEach( cat => CategoriesAndCount.Add(cat));
-            
+            List<Model.RevitBase> loadedCategories = GroupByCategory.Execute(SQLDB, SelectedDatabase);
+
+            loadedCategories.ForEach(cat => CategoriesAndCount.Add(cat));
+
+            foreach (Model.RevitCategories cat in loadedCategories)
+            {
+                try
+                {
+                    DictCategoriesAndCount.Add(cat.CategoryName, cat.CategoryCount);
+                }
+                catch
+                {
+                    DictCategoriesAndCount[cat.CategoryName] = cat.CategoryCount;
+                }
+            }
+
+            List<Model.RevitBase> existingCategories = CategoriesAndCount.ToList();
+
+            foreach (Model.RevitCategories cat in existingCategories)
+            {
+                int count = 0;
+
+                if (DictCategoriesAndCount.TryGetValue(cat.CategoryName, out count))
+                {
+                    cat.VariationOnPrevious = cat.CategoryCount - count;
+                }
+                else
+                {
+                    cat.VariationOnPrevious = cat.CategoryCount;
+                }
+
+            }
         }
 
         private void UndoFilter()

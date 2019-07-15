@@ -13,12 +13,12 @@ namespace MetamorphosisDeskApp.ViewModel
             List<Model.RevitBase> result = new List<Model.RevitBase>();
             try
             {
-                List<Model.RevitSummary> revitElements = SQLDB.GetCategoryCount(SelectedDatabase.FullName, SelectedDatabase.Name);
+                List<Model.RevitCategories> revitElements = SQLDB.GetCategoryCount(SelectedDatabase.FullName, SelectedDatabase.Name);
 
                 var random = new Random();
                 var color = String.Format("#{0:X6}", random.Next(0x1000000));
 
-                foreach (Model.RevitSummary item in revitElements)
+                foreach (Model.RevitCategories item in revitElements)
                 {
                     item.ColorSet = color;
                     result.Add(item);

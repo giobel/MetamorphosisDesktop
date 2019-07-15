@@ -93,9 +93,9 @@ namespace MetamorphosisDeskApp.Model
             return CountCategory;
         }
 
-        public List<RevitSummary> GetCategoryCount(string dbFilePath, string dbFileName)
+        public List<RevitCategories> GetCategoryCount(string dbFilePath, string dbFileName)
         {
-            List<RevitSummary> CountCategory = new List<RevitSummary>();
+            List<RevitCategories> CountCategory = new List<RevitCategories>();
 
             using (SQLiteConnection conn = createConnection(dbFilePath))
             {
@@ -109,7 +109,7 @@ namespace MetamorphosisDeskApp.Model
                     {
                         string category = reader.GetString(0);
                         int count = reader.GetInt32(1);
-                        RevitSummary element = new RevitSummary() { CategoryName = category, DBFileName = dbFileName, CategoryCount=count};
+                        RevitCategories element = new RevitCategories() { CategoryName = category, DBFileName = dbFileName, CategoryCount=count, VariationOnPrevious=count};
                         CountCategory.Add(element);
                     }
                 }

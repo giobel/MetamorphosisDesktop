@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace MetamorphosisDeskApp.Model
 {
-    public class RevitSummary : RevitBase
+    public class RevitCategories : RevitBase
     {
         public string DBFileName { get; set; }
         public int CategoryCount { get; set; }
-        
+        public int VariationOnPrevious { get; set; }
         
     }
 }
