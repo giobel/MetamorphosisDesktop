@@ -44,7 +44,8 @@ namespace MetamorphosisDeskApp.Model
             {
                 conn.Open();
 
-                 var cmd = LaunchCommand(conn, "select id,external_id,category,isType FROM _objects_id");
+                //var cmd = LaunchCommand(conn, "select id,external_id,category,isType FROM _objects_id");
+                var cmd = LaunchCommand(conn, "SELECT _objects_id.id, _objects_id.external_id, _objects_id.category,_objects_id.isType, _objects_geom.BoundingBoxMax, _objects_geom.BoundingBoxMin FROM _objects_geom JOIN _objects_id ON _objects_geom.id = _objects_id.id");
 
                 using (SQLiteDataReader reader = cmd.ExecuteReader())
                 {
@@ -57,12 +58,32 @@ namespace MetamorphosisDeskApp.Model
                         string cat = reader.GetString(2);
                         int isType = reader.GetInt32(3);
 
+                        
+                        PointXYZ bboxMaxPt = PointXYZ.ParsePoint(reader.GetString(4));
+                        PointXYZ bboxMinPt = PointXYZ.ParsePoint(reader.GetString(5));
+
+                        //string[] bboxMax = reader.GetBlob(4,true).ToString().Split(',');
+                        //string[] bboxMin = reader.GetBlob(5,true).ToString().Split(',');
+
+                        //PointXYZ bboxMaxPt = new PointXYZ(double.Parse(bboxMax[0]), double.Parse(bboxMax[1]), double.Parse(bboxMax[2]));
+                        //PointXYZ bboxMinPt = new PointXYZ(double.Parse(bboxMin[0]), double.Parse(bboxMin[1]), double.Parse(bboxMin[2]));
+
                         revitElement.DBFileName = dbFileName;
                         revitElement.CategoryCount = 1;
                         revitElement.CategoryName = cat;
                         revitElement.UniqueId = guid;
                         revitElement.IsType = (isType == 1);
-                        
+
+                        PointXYZ centroid = new PointXYZ(0, 0, -1);
+
+                        if (bboxMaxPt != null && bboxMinPt != null)
+                        {
+                            centroid = PointXYZ.Center(bboxMaxPt, bboxMinPt);
+                        }
+
+                        //revitElement.LocationPoint = PointXYZ.ToString(centroid);
+                        revitElement.LocationPoint = centroid;
+
                         revitElements.Add(revitElement);
                     }
                 }

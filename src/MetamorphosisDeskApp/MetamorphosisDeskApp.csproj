@@ -86,6 +86,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Model\FileSizeConverter.cs" />
+    <Compile Include="Model\PointXYZ.cs" />
     <Compile Include="Model\RevitBase.cs" />
     <Compile Include="Model\RevitCategories.cs" />
     <Compile Include="Model\SQLDBUtilities.cs" />

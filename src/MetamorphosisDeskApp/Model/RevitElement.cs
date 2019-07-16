@@ -24,7 +24,7 @@ namespace MetamorphosisDeskApp.Model
 
         public Dictionary<int, int> ParameterValueIds { get; set; } = new Dictionary<int, int>();
 
-        //public XYZ LocationPoint { get; set; }
+        public PointXYZ LocationPoint { get; set; }
         //public XYZ LocationPoint2 { get; set; }
 
         public float Rotation { get; set; } = -1.0f;

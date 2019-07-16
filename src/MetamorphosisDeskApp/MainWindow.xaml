@@ -91,6 +91,7 @@
                 <DataGridTextColumn Binding="{Binding VariationOnPrevious, StringFormat={}{0:+#;-#;''}}" Header="Variation" />
                 <DataGridTextColumn Binding="{Binding ElementId }" Header="UniqueId" />
                 <DataGridTextColumn Binding="{Binding Path=IsType}" Header="Is Type?"/>
+                <DataGridTextColumn Binding="{Binding Path=LocationPoint}" Header="LocationPoint"/>
             </DataGrid.Columns>
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
